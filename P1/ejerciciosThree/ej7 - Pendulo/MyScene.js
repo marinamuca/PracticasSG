@@ -8,7 +8,7 @@ import { Stats } from '../libs/stats.module.js'
 
 // Clases de mi proyecto
 
-import { barrido } from './barrido.js'
+import { pendulo1 } from './pendulo1.js'
 
  
 /// La clase fachada del modelo
@@ -49,8 +49,11 @@ class MyScene extends THREE.Scene {
     // Por último creamos el modelo.
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-    this.barrido = new barrido (this.gui, "Controles barrido");
-    this.add (this.barrido);
+    this.pendulo1 = new pendulo1 (this.gui, "Controles Primer Pendulo");
+
+    
+    this.add (this.pendulo1);
+
 
   }
   
@@ -124,11 +127,26 @@ class MyScene extends THREE.Scene {
     this.guiControls = {
       // En el contexto de una función   this   alude a la función
       lightIntensity : 0.5,
-      axisOnOff : true
+      axisOnOff : true,
+      sizep1 : 1,
+      sizep2 : 1,
+      rotp1 : 0,
+      rotp2 : 0,
+      pos : 10,
+
+      reset : () => {
+        this.guiControls.sizep1 = 1.0;
+        this.guiControls.sizep2 = 1.0;
+        this.guiControls.rotp1 = 0;
+        this.guiControls.rotp2 = 0;
+        this.guiControls.pos = 10;
+      }
     }
 
     // Se crea una sección para los controles de esta clase
     var folder = gui.addFolder ('Luz y Ejes');
+    var folderp1 = gui.addFolder('Controles Primer Péndulo');
+    var folderp2 = gui.addFolder('Controles Segundo Péndulo');
     
     // Se le añade un control para la intensidad de la luz
     folder.add (this.guiControls, 'lightIntensity', 0, 1, 0.1)
@@ -139,6 +157,16 @@ class MyScene extends THREE.Scene {
     folder.add (this.guiControls, 'axisOnOff')
       .name ('Mostrar ejes : ')
       .onChange ( (value) => this.setAxisVisible (value) );
+
+    folderp1.add(this.guiControls, 'sizep1', 1, 2, 0.1).name ('Longitud : ').listen();
+    folderp2.add(this.guiControls, 'sizep2', 1, 2, 0.1).name ('Longitud : ').listen();
+
+    folderp1.add (this.guiControls, 'rotp1', -Math.PI/4, Math.PI/4, 0.1).name ('Giro : ').listen();
+    folderp2.add (this.guiControls, 'rotp2', -Math.PI/4, Math.PI/4, 0.1).name ('Giro : ').listen();
+    folderp2.add (this.guiControls, 'pos', 10, 90, 1).name ('Posicion (%) : ').listen();
+
+    gui.add (this.guiControls, 'reset').name ('[ Reset ]');
+    
     
     return gui;
   }
@@ -220,8 +248,7 @@ class MyScene extends THREE.Scene {
     this.cameraControl.update();
     
     // Se actualiza el resto del modelo
-    this.barrido.update();
-    
+    this.pendulo1.update(this.guiControls.sizep1, this.guiControls.rotp1, this.guiControls.pos, this.guiControls.sizep2, this.guiControls.rotp2); 
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
     this.renderer.render (this, this.getCamera());
 

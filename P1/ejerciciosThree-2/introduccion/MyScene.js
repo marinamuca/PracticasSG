@@ -8,7 +8,7 @@ import { Stats } from '../libs/stats.module.js'
 
 // Clases de mi proyecto
 
-import { barrido } from './barrido.js'
+import { MyBox } from './MyBox.js'
 
  
 /// La clase fachada del modelo
@@ -21,7 +21,7 @@ class MyScene extends THREE.Scene {
     super();
     
     // Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
-    this.renderer = this.createRenderer(myCanvas); //Redenderer = visualizador
+    this.renderer = this.createRenderer(myCanvas);
     
     // Se añade a la gui los controles para manipular los elementos de esta clase
     this.gui = this.createGUI ();
@@ -38,10 +38,9 @@ class MyScene extends THREE.Scene {
     this.createCamera ();
     
     // Un suelo 
-    //this.createGround ();
+    this.createGround ();
     
-    // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas 
-    //Meto los ejes en cad objeto
+    // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
     this.axis = new THREE.AxesHelper (5);
     this.add (this.axis);
     
@@ -49,9 +48,8 @@ class MyScene extends THREE.Scene {
     // Por último creamos el modelo.
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-    this.barrido = new barrido (this.gui, "Controles barrido");
-    this.add (this.barrido);
-
+    this.model = new MyBox(this.gui, "Controles de la Caja");
+    this.add (this.model);
   }
   
   initStats() {
@@ -81,7 +79,7 @@ class MyScene extends THREE.Scene {
     // Y hacia dónde mira
     var look = new THREE.Vector3 (0,0,0);
     this.camera.lookAt(look);
-    this.add (this.camera); //Conectar al grafo de escena
+    this.add (this.camera);
     
     // Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
     this.cameraControl = new TrackballControls (this.camera, this.renderer.domElement);
@@ -220,7 +218,7 @@ class MyScene extends THREE.Scene {
     this.cameraControl.update();
     
     // Se actualiza el resto del modelo
-    this.barrido.update();
+    this.model.update();
     
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
     this.renderer.render (this, this.getCamera());

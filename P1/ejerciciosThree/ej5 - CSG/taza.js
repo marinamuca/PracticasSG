@@ -1,6 +1,7 @@
 import * as THREE from '../libs/three.module.js'
+import { CSG } from '../libs/CSG-v2.js'
  // lo que no se conecte al grafo de escena, no aparece en esta.
-class barrido extends THREE.Object3D {
+class taza extends THREE.Object3D {
   constructor(gui,titleGui) {
     super();
     
@@ -11,23 +12,30 @@ class barrido extends THREE.Object3D {
     // this.axis = new THREE.AxesHelper (5);
     // this.add (this.axis);
 
-    this.heartShape = new THREE.Shape();
+    // Cilindro exterior
+    var geometry = new THREE.CylinderGeometry( 5, 5, 10, 32 );
+    var material = new THREE.MeshNormalMaterial();
+    this.exterior = new THREE.Mesh( geometry, material );
 
-    this.heartShape.moveTo(25, 25);
-    this.heartShape.bezierCurveTo(25, 25, 20, 0, 0, 0);
-    this.heartShape.bezierCurveTo(- 30, 0, - 30, 35, - 30, 35);
-    this.heartShape.bezierCurveTo(- 30, 55, - 10, 77, 25, 95);
-    this.heartShape.bezierCurveTo(60, 77, 80, 55, 80, 35);
-    this.heartShape.bezierCurveTo(80, 35, 80, 0, 50, 0);
-    this.heartShape.bezierCurveTo(35, 0, 25, 25, 25, 25);
+    // Cilindro interior
+    geometry = new THREE.CylinderGeometry( 4.7, 4.7, 10, 32 );
+    geometry.translate(0,0.3,0);
+    this.interior = new THREE.Mesh( geometry, material );
 
-    this.extrudeSettings = { depth: 1, bevelEnabled: false };
+    // Toro: asa
+    geometry = new THREE.TorusGeometry( 3, 0.5, 24, 32 );
+    geometry.translate(-5,0,0);
+    this.toro = new THREE.Mesh( geometry, material );
+
+    // this.toro.translateX = -5;
+
+    this.csg = new CSG();
+    this.csg.union([this.exterior, this.toro]);
+    this.csg.subtract([this.interior]);
+
+    var mesh = this.csg.toMesh();
     
-    const geometry = new THREE.ExtrudeGeometry(this.heartShape, this.extrudeSettings);
-
-    this.mesh = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
-
-    this.add(this.mesh);
+    this.add(mesh);
     
   }
   
@@ -35,12 +43,6 @@ class barrido extends THREE.Object3D {
     // Controles para el tamaño, la orientación y la posición de la caja
     this.guiControls = {
       size : 1.0,
-      depth : 1,
-      bevelEnabled: false,
-      bevelSegments: 1,
-      steps: 1,
-      bevelSize: 1,
-      bevelThickness: 1,
       
       rotX : 0.0,
       rotY : 0.0,
@@ -54,12 +56,6 @@ class barrido extends THREE.Object3D {
       // Cuando se pulse se ejecutará esta función.
       reset : () => {
         this.guiControls.size = 1.0;
-        this.guiControls.depth = 1;
-        this.guiControls.bevelEnabled = false;
-        this.guiControls.bevelSegments = 1;
-        this.guiControls.steps = 1;
-        this.guiControls.bevelSize = 1;
-        this.guiControls.bevelThickness = 1;
         
         this.guiControls.rotX = 0.0;
         this.guiControls.rotY = 0.0;
@@ -77,13 +73,6 @@ class barrido extends THREE.Object3D {
     // Las tres cifras indican un valor mínimo, un máximo y el incremento
     // El método   listen()   permite que si se cambia el valor de la variable en código, el deslizador de la interfaz se actualice
     folder.add (this.guiControls, 'size', 0.1, 5.0, 0.1).name ('Tamaño : ').listen();
-    folder.add (this.guiControls, 'depth', 1, 100, 1).name('Depth: ').listen();
-    folder.add (this.guiControls, 'bevelEnabled', true, false).name("Biselado:");
-    this.bevelsettings = folder.addFolder("Settings Bisel");
-    this.bevelsettings.add (this.guiControls, 'bevelSegments', 1, 100, 1).name('Segmentos: ').listen();
-    this.bevelsettings.add (this.guiControls, 'steps', 1, 100, 1).name('Steps: ').listen();
-    this.bevelsettings.add (this.guiControls, 'bevelSize', 1, 100, 1).name('Tamaño: ').listen();
-    this.bevelsettings.add (this.guiControls, 'bevelThickness', 1, 100, 1).name('Ancho: ').listen();
     
     folder.add (this.guiControls, 'rotX', 0.0, Math.PI/2, 0.1).name ('Rotación X : ').listen();
     folder.add (this.guiControls, 'rotY', 0.0, Math.PI/2, 0.1).name ('Rotación Y : ').listen();
@@ -97,7 +86,7 @@ class barrido extends THREE.Object3D {
   }
 
   setDetail(detail){
-    var aux = this.barrido;
+    var aux = this.taza;
 
   }
   
@@ -110,24 +99,11 @@ class barrido extends THREE.Object3D {
     // Y por último la traslación
    
     this.position.set (this.guiControls.posX,this.guiControls.posY,this.guiControls.posZ);
-    this.extrudeSettings.depth = this.guiControls.depth;
-    this.extrudeSettings.bevelEnabled = this.guiControls.bevelEnabled;
-    this.extrudeSettings.bevelSegments = this.guiControls.bevelSegments;
-    this.extrudeSettings.steps = this.guiControls.steps;
-    this.extrudeSettings.bevelSize = this.guiControls.bevelSize;
-    this.extrudeSettings.bevelThickness = this.guiControls.bevelThickness;
 
-    this.mesh.geometry.dispose();
-    this.mesh.geometry = new THREE.ExtrudeGeometry(this.heartShape, this.extrudeSettings)
-    if(this.guiControls.bevelEnabled == false)
-      this.bevelsettings.hide();
-    else
-      this.bevelsettings.show();
-
-    // this.barrido.rotation.x +=0.1;
+    // this.taza.rotation.x +=0.1;
     this.rotation.set (this.guiControls.rotX,this.guiControls.rotY,this.guiControls.rotZ);
     this.scale.set (this.guiControls.size,this.guiControls.size,this.guiControls.size);
   }
 }
 
-export { barrido };
+export { taza };

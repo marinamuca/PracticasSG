@@ -8,7 +8,7 @@ import { Stats } from '../libs/stats.module.js'
 
 // Clases de mi proyecto
 
-import { barrido } from './barrido.js'
+import { objLoad } from './objLoad.js'
 
  
 /// La clase fachada del modelo
@@ -49,8 +49,8 @@ class MyScene extends THREE.Scene {
     // Por último creamos el modelo.
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-    this.barrido = new barrido (this.gui, "Controles barrido");
-    this.add (this.barrido);
+    this.objLoad = new objLoad (this.gui, "Controles objLoad");
+    this.add (this.objLoad);
 
   }
   
@@ -220,7 +220,7 @@ class MyScene extends THREE.Scene {
     this.cameraControl.update();
     
     // Se actualiza el resto del modelo
-    this.barrido.update();
+    this.objLoad.update();
     
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
     this.renderer.render (this, this.getCamera());
