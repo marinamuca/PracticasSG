@@ -20,6 +20,7 @@ class barrido extends THREE.Object3D {
     this.heartShape.bezierCurveTo(60, 77, 80, 55, 80, 35);
     this.heartShape.bezierCurveTo(80, 35, 80, 0, 50, 0);
     this.heartShape.bezierCurveTo(35, 0, 25, 25, 25, 25);
+    
 
     this.extrudeSettings = { depth: 1, bevelEnabled: false };
     

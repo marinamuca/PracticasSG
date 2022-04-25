@@ -12,18 +12,17 @@ class pendulo2 extends THREE.Object3D {
     var boxGeom = new THREE.BoxGeometry(1,10,0.5);
     // Primero traslado
     boxGeom.translate(0,-5,0);
-    var boxMat = new THREE.MeshBasicMaterial({color: 0x3366ff});
+    var boxMat = new THREE.MeshPhongMaterial({color: 0x3366ff});
     this.boxMesh = new THREE.Mesh(boxGeom, boxMat);
     this.boxMesh.scale.y = 1;
-    
 
     var cylGeom = new THREE.CylinderGeometry(0.25,0.25,0.7)
     cylGeom.rotateX(Math.PI/2);
-    var cylMat = new THREE.MeshBasicMaterial({color: 0x009933})
+    var cylMat = new THREE.MeshPhongMaterial({color: 0x009933})
     this.cylMesh = new THREE.Mesh(cylGeom, cylMat)
     
-    this.boxMesh.position.set(0,0.5,0)
-    this.rotation.z = 0
+    this.boxMesh.position.y = 0.5
+    this.rotation.z = 0;
 
     //Añado la caja
     this.add(this.boxMesh)

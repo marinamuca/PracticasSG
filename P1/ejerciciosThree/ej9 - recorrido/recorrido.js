@@ -16,39 +16,65 @@ class recorrido extends THREE.Object3D {
     var texture = cargarTextura.load('../imgs/textura-ajedrezada.jpg');
     texture.repeat.set(0.1,1);
 
-    this.object = new THREE.Mesh(new THREE.ConeGeometry(1,3,3).rotateX(Math.PI / 2), new THREE.MeshPhongMaterial({map : texture}))
+    this.object = new THREE.Mesh(new THREE.ConeGeometry(0.5,1,3).rotateX(Math.PI / 2), new THREE.MeshPhongMaterial({map : texture}))
     this.add(this.object)
-    this.createPath();
+
+
+    this.curvaDcha();
+    this.curvaIzq();
+    this.createPath(this.splineDcha);
+    this.createPath(this.splineIzq);
     
     var origen = {p:0};
     var destino = {p:1};
-    var movimiento = new TWEEN.Tween(origen).to(destino, 4000)
-
-    movimiento.easing(TWEEN.Easing.Quadratic.InOut)
-    movimiento.repeat(Infinity)
-
-    movimiento.onUpdate(() => {
-      var posicion = this.spline.getPoint(origen.p);
+    var movimientoDch = new TWEEN.Tween(origen).to(destino, 4000)
+    
+    movimientoDch.easing(TWEEN.Easing.Quadratic.InOut)
+    // movimientoDch.repeat(Infinity)
+    
+    movimientoDch.onUpdate((origen)=>{
+      var posicion = this.splineDcha.getPoint(origen.p);
       this.object.position.copy(posicion)
-      var tangente = this.spline.getTangentAt(origen.p);
+      var tangente = this.splineDcha.getTangentAt(origen.p);
       posicion.add(tangente)
       this.object.lookAt(posicion)
     });
     
-    movimiento.start();
+    origen = {p:0};
+    destino = {p:1}; 
+    var movimientoIzq = new TWEEN.Tween(origen).to(destino, 8000)
+    movimientoIzq.easing(TWEEN.Easing.Quadratic.InOut)
+    movimientoIzq.onUpdate(()=>{
+      var posicion = this.splineIzq.getPoint(origen.p);
+      this.object.position.copy(posicion)
+      var tangente = this.splineIzq.getTangentAt(origen.p);
+      posicion.add(tangente)
+      this.object.lookAt(posicion)
+    });
+
+    movimientoDch.chain(movimientoIzq);
+    movimientoIzq.chain(movimientoDch);
+    
+    movimientoDch.start();
     
   }
 
-  createPath(){
-    this.spline = new THREE.CatmullRomCurve3( [
-      new THREE.Vector3( -10, 0, 10 ),
-      new THREE.Vector3( -5, 5, 5 ),
-      new THREE.Vector3( 0, 0, 0 ),
-      new THREE.Vector3( 5, -5, 5 ),
-      new THREE.Vector3( 10, 0, 10 )
-    ] );
+  updateMov(origen) {
+    
+  }
 
-    const points = this.spline.getPoints( 100 );
+  onUpdate(spline) {
+
+    var posicion = spline.getPoint(origen.p);
+    this.object.position.copy(posicion)
+    var tangente = spline.getTangentAt(origen.p);
+    posicion.add(tangente)
+    this.object.lookAt(posicion)
+
+  };
+
+  createPath(curve){
+    const points = curve.getPoints( 100 );
     const geometry = new THREE.BufferGeometry().setFromPoints( points );
 
     const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
@@ -56,6 +82,34 @@ class recorrido extends THREE.Object3D {
     // Create the final object to add to the scene
     var spline = new THREE.Line( geometry, material ); 
     this.add(spline)
+  }
+
+  curvaDcha(){
+    this.splineDcha = new THREE.CatmullRomCurve3( [
+      // new THREE.Vector3( -5, 0, 10 ),
+      // new THREE.Vector3( -5, 5, 5 ),
+      // new THREE.Vector3( 0, 0, 0 ),
+      new THREE.Vector3( 5, 5, 7 ),
+      new THREE.Vector3( 10, 3, 7 ),
+      new THREE.Vector3( 13, 4, 6 ),
+      new THREE.Vector3( 15, 6, -1 ),
+      new THREE.Vector3( 7, 4, -1 ),
+      new THREE.Vector3( 1, 3, 1 )
+      
+    ] );
+  }
+  curvaIzq(){
+    this.splineIzq = new THREE.CatmullRomCurve3( [
+      new THREE.Vector3( 1, 3, 1 ),
+      // new THREE.Vector3( 5, 2, 0 ),
+      // new THREE.Vector3( 3, -1, -5 ),
+      // new THREE.Vector3( 7, -6, 3 ),
+      new THREE.Vector3( -10, 2, 3 ),
+      new THREE.Vector3( -10, 6, 9 ),
+      new THREE.Vector3( -5, 8, 9 ),
+      new THREE.Vector3( 0, 7, 7 ),
+      new THREE.Vector3( 5, 5, 7 )
+    ] );
   }
 
   createGUI (gui,titleGui) {

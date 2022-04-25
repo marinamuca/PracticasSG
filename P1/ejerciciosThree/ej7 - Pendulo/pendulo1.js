@@ -12,7 +12,7 @@ class pendulo1 extends THREE.Object3D {
     
     this.h = 5;
     var boxGeom = new THREE.BoxGeometry(2,5,1);
-    var boxMat = new THREE.MeshBasicMaterial({color: 0xcc0000});
+    var boxMat = new THREE.MeshPhongMaterial({color: 0xcc0000});
 
     // Primero traslado
     boxGeom.translate(0,-2.5,0);
@@ -22,7 +22,7 @@ class pendulo1 extends THREE.Object3D {
 
     //Creo las cajas verdes
     boxGeom = new THREE.BoxGeometry(2,4,1);
-    boxMat = new THREE.MeshBasicMaterial({color: 0x009900});
+    boxMat = new THREE.MeshPhongMaterial({color: 0x009900});
     boxGeom.translate(0,0,0);
     this.greenBoxTop = new THREE.Mesh(boxGeom, boxMat);
   
@@ -36,7 +36,7 @@ class pendulo1 extends THREE.Object3D {
     // EJE ROTACION:
     var cylGeom = new THREE.CylinderGeometry(0.75,0.75,1.3)
     cylGeom.rotateX(Math.PI/2);
-    var cylMat = new THREE.MeshBasicMaterial({color: 0xD595D4})
+    var cylMat = new THREE.MeshPhongMaterial({color: 0xD595D4})
     this.cylMesh = new THREE.Mesh(cylGeom, cylMat)
 
     this.pendulo2 = new pendulo2()
